@@ -30,10 +30,55 @@ ChatBot::ChatBot(std::string filename)
     _image = new wxBitmap(filename, wxBITMAP_TYPE_PNG);
 }
 
+//// STUDENT CODE ADDED FROM HERE:
+////
+
+// copy constructor
+ChatBot::ChatBot(const ChatBot& other)
+{
+    std::cout << "ChatBot Copy Constructor" << std::endl;
+
+    // In a copy construction, the source object, 'other', will continue to keep its resources
+    // Theoretically, any of the two ChatBots can be used as active ones. Therefore,
+    // I leave the source be unchanged and continue to be the main targe. The user needs
+    // to make changes to this if needed.
+    
+    // link to data handles
+    _chatLogic = other._chatLogic;
+    _rootNode = other._rootNode;
+    _image = NULL;
+
+    if (other._image != NULL) _image = new wxBitmap(*other._image);
+}
+
+// move constructor
+ChatBot::ChatBot(ChatBot&& other)
+{
+    std::cout << "ChatBot Move Constructor" << std::endl;
+    
+    // In a moive construction, the source object, 'other', will lose its resources. Therefore,
+    // I link all the data in such a way that this object can become the active chatbot. 
+    // For that, the _chatLogic should have a reference to this obkect, which can be done by
+    //     _chatLogic->SetChatbotHandle(this);
+
+    // link to data handles and setting this object as the active one in _chatLogic
+    _chatLogic = other._chatLogic;
+    _chatLogic->SetChatbotHandle(this);
+
+    _rootNode = other._rootNode;
+    _image = other._image;
+
+    other._image = NULL;
+
+}
+
+
+// destructor
 ChatBot::~ChatBot()
 {
     std::cout << "ChatBot Destructor" << std::endl;
 
+    // The only resource owned by this object is _image.
     // deallocate heap memory
     if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
     {
@@ -42,8 +87,62 @@ ChatBot::~ChatBot()
     }
 }
 
-//// STUDENT CODE
-////
+// copy assignment operator
+ChatBot& ChatBot::operator=(const ChatBot& other)
+{
+    std::cout << "ChatBot Copy Assignment Operator" << std::endl;
+
+    // In a copy assignment, the source object, 'other', will continue to keep its resources.
+    // Theoretically, any of the two ChatBots can be used as active ones. Therefore,
+    // I leave the source be unchanged and continue to be the main targe. The user needs
+    // to make changes to this if needed.
+
+    // link to data handles 
+
+    if (this != &other){
+        _chatLogic = other._chatLogic;
+        _rootNode = other._rootNode;
+
+        if (_image != NULL){
+            delete _image;
+        }
+        _image = new wxBitmap(*(other._image));
+    }
+    return *this;
+}
+
+// move assignment operator
+ChatBot& ChatBot::operator=(ChatBot&& other)
+{
+    std::cout << "ChatBot Move Assignment Operator" << std::endl;
+
+    // In a moive assignment, the source object, 'other', will lose its resources. Therefore,
+    // I link all the data in such a way that this object can become the active chatbot. 
+    // For that, the _chatLogic should have a reference to this obkect, which can be done by
+    //     _chatLogic->SetChatbotHandle(this);
+
+    // link to data handles and setting this object as the active one in _chatLogic
+
+    if (this != &other)
+    {
+        _chatLogic = other._chatLogic;
+        _chatLogic->SetChatbotHandle(this);
+
+        _rootNode = other._rootNode;
+
+    // How to do with the data handles is not well-defined. I choose to totally invalidate the
+    // destination obeject.
+        other._chatLogic = NULL;
+        other._rootNode = NULL;
+        
+        if (_image != NULL){
+            delete _image;
+        }
+        _image = other._image;
+        other._image = NULL;
+    }
+    return *this;
+}
 
 ////
 //// EOF STUDENT CODE

@@ -117,8 +117,11 @@ ChatBotPanelDialog::ChatBotPanelDialog(wxWindow *parent, wxWindowID id)
     //// STUDENT CODE
     ////
 
+    // ChatLogic defined as a unique pointer and initialized by std::make_unique
     // create chat logic instance
-    _chatLogic = new ChatLogic(); 
+    _chatLogic = std::make_unique<ChatLogic>(); // Initialization of unique pointer with make_unique
+
+    // Otherwise, same as before with creating links and reading the graph:
 
     // pass pointer to chatbot dialog so answers can be displayed in GUI
     _chatLogic->SetPanelDialogHandle(this);
@@ -135,7 +138,8 @@ ChatBotPanelDialog::~ChatBotPanelDialog()
     //// STUDENT CODE
     ////
 
-    delete _chatLogic;
+    // Not needed as chatLogic is a unique pointer and will be removed when it is out of scope.
+    //delete _chatLogic; 
 
     ////
     //// EOF STUDENT CODE
